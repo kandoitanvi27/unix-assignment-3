@@ -1,4 +1,5 @@
 import os
+import time
 import psycopg2
 from flask import Flask, render_template, request, redirect, url_for
 
@@ -24,20 +25,29 @@ def get_db_connection():
 
 
 def init_db():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute(
-        """
-        CREATE TABLE IF NOT EXISTS todos (
-            id SERIAL PRIMARY KEY,
-            title VARCHAR(200) NOT NULL,
-            done BOOLEAN DEFAULT FALSE
-        )
-        """
-    )
-    conn.commit()
-    cur.close()
-    conn.close()
+    retries = 10
+    while retries > 0:
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS todos (
+                    id SERIAL PRIMARY KEY,
+                    title VARCHAR(200) NOT NULL,
+                    done BOOLEAN DEFAULT FALSE
+                )
+                """
+            )
+            conn.commit()
+            cur.close()
+            conn.close()
+            print("Database initialized successfully.")
+            return
+        except psycopg2.OperationalError:
+            retries -= 1
+            print(f"Waiting for database... ({10 - retries}/10)")
+            time.sleep(3)
 
 
 @app.route("/")

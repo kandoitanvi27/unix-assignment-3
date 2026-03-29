@@ -16,9 +16,17 @@
     <ul>
         {% for todo in todos %}
         <li>
-            {{ todo.title }}
+            <a href="/toggle/{{ todo.id }}">
+                {% if todo.done %}[x]{% else %}[ ]{% endif %}
+            </a>
+            <span class="{% if todo.done %}done{% endif %}">{{ todo.title }}</span>
+            <a href="/delete/{{ todo.id }}" class="delete">Delete</a>
         </li>
         {% endfor %}
     </ul>
+
+    {% if not todos %}
+    <p>No todos yet. Add one above!</p>
+    {% endif %}
 </body>
 </html>

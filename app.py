@@ -51,6 +51,41 @@ def index():
     return render_template("index.html", todos=todos)
 
 
+@app.route("/add", methods=["POST"])
+def add():
+    title = request.form.get("title", "").strip()
+    if title:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("INSERT INTO todos (title) VALUES (%s)", (title,))
+        conn.commit()
+        cur.close()
+        conn.close()
+    return redirect(url_for("index"))
+
+
+@app.route("/toggle/<int:todo_id>")
+def toggle(todo_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE todos SET done = NOT done WHERE id = %s", (todo_id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return redirect(url_for("index"))
+
+
+@app.route("/delete/<int:todo_id>")
+def delete(todo_id):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM todos WHERE id = %s", (todo_id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return redirect(url_for("index"))
+
+
 @app.route("/health")
 def health():
     return {"status": "ok"}

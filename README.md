@@ -28,3 +28,31 @@ A simple two-tier web application built with Flask (web frontend/API) and Postgr
     ├── db-deployment.yaml
     └── db-service.yaml
 ```
+
+## Running with Docker Compose
+
+```bash
+docker-compose up --build
+```
+
+Open http://localhost:5000 in your browser.
+
+## Running with Kubernetes (Minikube)
+
+```bash
+# Start Minikube
+minikube start
+
+# Build the Docker image inside Minikube
+eval $(minikube docker-env)
+docker build -t todo-app:latest .
+
+# Apply Kubernetes manifests
+kubectl apply -f k8s/
+
+# Wait for pods to be ready
+kubectl get pods
+
+# Access the app
+minikube service todo-app
+```
